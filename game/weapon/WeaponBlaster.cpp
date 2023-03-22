@@ -40,6 +40,7 @@ private:
 	stateResult_t		State_Charged			( const stateParms_t& parms );
 	stateResult_t		State_Fire				( const stateParms_t& parms );
 	stateResult_t		State_Flashlight		( const stateParms_t& parms );
+	stateResult_t		State_Reload			(const stateParms_t& parms);
 	
 	CLASS_STATES_PROTOTYPE ( rvWeaponBlaster );
 };
@@ -225,6 +226,7 @@ CLASS_STATES_DECLARATION ( rvWeaponBlaster )
 	STATE ( "Charged",						rvWeaponBlaster::State_Charged )
 	STATE ( "Fire",							rvWeaponBlaster::State_Fire )
 	STATE ( "Flashlight",					rvWeaponBlaster::State_Flashlight )
+	STATE("Reload",							rvWeaponBlaster::State_Reload)
 END_CLASS_STATES
 
 /*
@@ -319,7 +321,54 @@ stateResult_t rvWeaponBlaster::State_Idle ( const stateParms_t& parms ) {
 			if ( UpdateAttack ( ) ) {
 				return SRESULT_DONE;
 			}
+			// Auto reload?
+			if (AutoReload() && !AmmoInClip() && AmmoAvailable()) {
+				SetState("reload", 2);
+				return SRESULT_DONE;
+			}
+			if (wsfl.netReload || (wsfl.reload && AmmoInClip() < ClipSize() && AmmoAvailable() > AmmoInClip())) {
+				SetState("Reload", 4);
+				return SRESULT_DONE;
+			}
 			return SRESULT_WAIT;
+	}
+	return SRESULT_ERROR;
+}
+
+/*
+================
+rvWeaponBlaster::State_Reload
+================
+*/
+stateResult_t rvWeaponBlaster::State_Reload(const stateParms_t& parms) {
+	enum {
+		STAGE_INIT,
+		STAGE_WAIT,
+	};
+	switch (parms.stage) {
+	case STAGE_INIT:
+		if (wsfl.netReload) {
+			wsfl.netReload = false;
+		}
+		else {
+			NetReload();
+		}
+
+		SetStatus(WP_RELOAD);
+		return SRESULT_STAGE(STAGE_WAIT);
+
+	case STAGE_WAIT:
+		if (AnimDone(ANIMCHANNEL_ALL, 4)) {
+			AddToClip(ClipSize());
+			SetState("Idle", 4);
+			return SRESULT_DONE;
+		}
+		if (wsfl.lowerWeapon) {
+			StopSound(SND_CHANNEL_BODY2, false);
+			SetState("Lower", 4);
+			return SRESULT_DONE;
+		}
+		return SRESULT_WAIT;
 	}
 	return SRESULT_ERROR;
 }
@@ -423,11 +472,9 @@ stateResult_t rvWeaponBlaster::State_Fire ( const stateParms_t& parms ) {
 				SetState ( "Idle", 4 );
 				return SRESULT_DONE;
 			}
-
-
-	
+			
 			if ( gameLocal.time - fireHeldTime > chargeTime ) {	
-				Attack ( true, 40, spread +10, 0, 1.0f );
+				Attack ( true, 1, spread +10, 0, 1.0f );
 				PlayEffect ( "fx_chargedflash", barrelJointView, false );
 				PlayAnim( ANIMCHANNEL_ALL, "chargedfire", parms.blendFrames );
 			} else {

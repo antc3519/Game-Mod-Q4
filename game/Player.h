@@ -135,6 +135,11 @@ enum {
 	POWERUP_GUARD,
 	POWERUP_DOUBLER,
 	POWERUP_SCOUT,	// == 1.2 / protocol 69's POWERUP_MAX-1
+	POWERUP_JUGGERNAUT,
+	POWERUP_JUMPER,
+	POWERUP_HEALER,
+	POWERUP_BLASTRESIST,
+	POWERUP_MOREAMMO,
 
 	POWERUP_MODERATOR, // Note: This has to be here.  Otherwise, it breaks syncronization with some list elsewhere
 		
@@ -196,6 +201,7 @@ class idInventory {
 public:
 	int						maxHealth;
 	int						weapons;
+	int						money;
 // RITUAL BEGIN
 // squirrel: Mode-agnostic buymenus
 	int						carryOverWeapons;
@@ -203,6 +209,8 @@ public:
 	int						powerups;
 	int						armor;
 	int						maxarmor;
+	int						damReduct;
+	int						speedy;
 	int						ammo[ MAX_AMMO ];
 	int						clip[ MAX_WEAPONS ];
 	int						powerupEndTime[ POWERUP_MAX ];

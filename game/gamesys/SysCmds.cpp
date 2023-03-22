@@ -516,6 +516,28 @@ void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value )
 		player->GivePowerUp( POWERUP_GUARD, -1 );
 		return;
 	}
+
+	if (idStr::Icmp(name, "juggernaut") == 0) {
+		player->inventory.maxHealth = player->inventory.maxHealth * 2;;
+		return;
+	}
+
+	if (idStr::Icmp(name, "jumper") == 0) {
+		player->GetPhysics()->SetGravity(player->GetPhysics()->GetGravity() / 2);
+		return;
+	}
+	if (idStr::Icmp(name, "shield") == 0) {
+		player->inventory.maxarmor = player->inventory.maxarmor * 2;
+		return;
+	}
+	if (idStr::Icmp(name, "hurtless") == 0) {
+		player->inventory.damReduct++;
+		return;
+	}
+	if (idStr::Icmp(name, "speedy") == 0) {
+		player->inventory.speedy++;
+		return;
+	}
 // RAVEN END
 
 	if ( !idStr::Icmp ( name, "wpmod_all" ) ) {
@@ -845,6 +867,8 @@ void Cmd_PlayerModel_f( const idCmdArgs &args ) {
 	player->SpawnToPoint( pos, ang );
 }
 
+
+
 /*
 ==================
 Cmd_Say
@@ -926,6 +950,8 @@ static void Cmd_Say( bool team, const idCmdArgs &args ) {
 		gameLocal.mpGame.ProcessChatMessage( gameLocal.localClientNum, team, name, text, NULL );
 	}
 }
+
+
 
 /*
 ==================
@@ -2924,10 +2950,7 @@ void Cmd_AddIcon_f( const idCmdArgs& args ) {
 // squirrel: Mode-agnostic buymenus
 void Cmd_ToggleBuyMenu_f( const idCmdArgs& args ) {
 	idPlayer* player = gameLocal.GetLocalPlayer();
-	if ( player && player->CanBuy() )
-	{
-		gameLocal.mpGame.OpenLocalBuyMenu();
-	}
+	gameLocal.mpGame.OpenLocalBuyMenu();
 }
 
 void Cmd_BuyItem_f( const idCmdArgs& args ) {
@@ -3037,6 +3060,78 @@ void Cmd_ClientOverflowReliable_f( const idCmdArgs& args ) {
 	}
 }
 #endif
+
+void Cmd_OpenShop(const idCmdArgs& args) {
+	idUserInterface* hud_ = gameLocal.GetLocalPlayer()->GetHud();
+	if(hud_->GetStateInt("shopOpen") == 1)
+		hud_->SetStateInt("shopOpen", 0);
+	else{
+		hud_->SetStateInt("shopOpen", 1);
+		hud_->HandleNamedEvent("shopMenu");
+	}
+	gameLocal.Printf("IT SHOULD WORK");
+}
+
+void Cmd_buyItem1(const idCmdArgs& args) {
+	idUserInterface* hud_ = gameLocal.GetLocalPlayer()->GetHud();
+	if (hud_->GetStateInt("shopOpen") == 1)
+		hud_->HandleNamedEvent("buy1");
+}
+
+void Cmd_buyItem2(const idCmdArgs& args) {
+	idUserInterface* hud_ = gameLocal.GetLocalPlayer()->GetHud();
+	if (hud_->GetStateInt("shopOpen") == 1)
+		hud_->HandleNamedEvent("buy2");
+}
+
+void Cmd_buyItem3(const idCmdArgs& args) {
+	idUserInterface* hud_ = gameLocal.GetLocalPlayer()->GetHud();
+	if (hud_->GetStateInt("shopOpen") == 1)
+		hud_->HandleNamedEvent("buy3");
+}
+
+void Cmd_buyItem4(const idCmdArgs& args) {
+	idUserInterface* hud_ = gameLocal.GetLocalPlayer()->GetHud();
+	if (hud_->GetStateInt("shopOpen") == 1)
+		hud_->HandleNamedEvent("buy4");
+}
+
+void Cmd_buyItem5(const idCmdArgs& args) {
+	idUserInterface* hud_ = gameLocal.GetLocalPlayer()->GetHud();
+	if (hud_->GetStateInt("shopOpen") == 1)
+		hud_->HandleNamedEvent("buy5");
+}
+void Cmd_buyJuggernaut(const idCmdArgs& args) {
+	idUserInterface* hud_ = gameLocal.GetLocalPlayer()->GetHud();
+	if (hud_->GetStateInt("shopOpen") == 1)
+		hud_->HandleNamedEvent("buy6");
+}
+void Cmd_buyJumper(const idCmdArgs& args) {
+	idUserInterface* hud_ = gameLocal.GetLocalPlayer()->GetHud();
+	if (hud_->GetStateInt("shopOpen") == 1)
+		hud_->HandleNamedEvent("buy7");
+}
+void Cmd_buyShield(const idCmdArgs& args) {
+	idUserInterface* hud_ = gameLocal.GetLocalPlayer()->GetHud();
+	if (hud_->GetStateInt("shopOpen") == 1)
+		hud_->HandleNamedEvent("buy8");
+}
+void Cmd_buyHarmless(const idCmdArgs& args) {
+	idUserInterface* hud_ = gameLocal.GetLocalPlayer()->GetHud();
+	if (hud_->GetStateInt("shopOpen") == 1)
+		hud_->HandleNamedEvent("buy9");
+}
+void Cmd_buySpeedy (const idCmdArgs& args) {
+	idUserInterface* hud_ = gameLocal.GetLocalPlayer()->GetHud();
+	if (hud_->GetStateInt("shopOpen") == 1)
+		hud_->HandleNamedEvent("buy10");
+}
+void Cmd_Math(const idCmdArgs& args) {
+	gameLocal.GetLocalPlayer()->GetHud()->SetStateInt("player_money", (gameLocal.GetLocalPlayer()->GetHud()->GetStateInt("player_money") - atoi(args.Argv(1))));
+}
+
+
+
 
 /*
 =================
@@ -3232,7 +3327,19 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand( "buyMenu",				Cmd_ToggleBuyMenu_f,		CMD_FL_GAME,				"Toggle buy menu (if in a buy zone and the game type supports it)" );
 	cmdSystem->AddCommand( "buy",					Cmd_BuyItem_f,				CMD_FL_GAME,				"Buy an item (if in a buy zone and the game type supports it)" );
 // RITUAL END
-
+	cmdSystem->AddCommand("shop", Cmd_OpenShop, CMD_FL_GAME, "SHOP STUFF GRRR");
+	cmdSystem->AddCommand("buy1", Cmd_buyItem1, CMD_FL_GAME, "SHOP STUFF GRRR");
+	cmdSystem->AddCommand("buy2", Cmd_buyItem2, CMD_FL_GAME, "SHOP STUFF GRRR");
+	cmdSystem->AddCommand("buy3", Cmd_buyItem3, CMD_FL_GAME, "SHOP STUFF GRRR");
+	cmdSystem->AddCommand("buy4", Cmd_buyItem4, CMD_FL_GAME, "SHOP STUFF GRRR");
+	cmdSystem->AddCommand("buy5", Cmd_buyItem5, CMD_FL_GAME, "SHOP STUFF GRRR");
+	cmdSystem->AddCommand("buy6", Cmd_buyJuggernaut, CMD_FL_GAME, "SHOP STUFF GRRR");
+	cmdSystem->AddCommand("buy7", Cmd_buyJumper, CMD_FL_GAME, "SHOP STUFF GRRR");
+	cmdSystem->AddCommand("buy8", Cmd_buyShield, CMD_FL_GAME, "SHOP STUFF GRRR");
+	cmdSystem->AddCommand("buy9", Cmd_buyHarmless, CMD_FL_GAME, "SHOP STUFF GRRR");
+	cmdSystem->AddCommand("buy10", Cmd_buySpeedy, CMD_FL_GAME, "SHOP STUFF GRRR");
+	
+	cmdSystem->AddCommand("money", Cmd_Math, CMD_FL_GAME, "money");
 }
 
 /*

@@ -2486,7 +2486,10 @@ void idActor::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 
 	if ( damage > 0 ) {
 		int oldHealth = health;
-		AdjustHealthByDamage ( damage );
+		if (inflictor->IsType(idPlayer::GetClassType()))
+			AdjustHealthByDamage(damage / gameLocal.GetLocalPlayer()->inventory.damReduct);
+		else
+			AdjustHealthByDamage(damage);
 		if ( health <= 0 ) {
 
 			//allow for quick burning

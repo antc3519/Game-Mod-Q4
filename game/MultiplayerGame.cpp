@@ -151,7 +151,6 @@ void idMultiplayerGame::Reset() {
 // RITUAL BEGIN
 // squirrel: Mode-agnostic buymenus
 	buyMenu = uiManager->FindGui( "guis/buymenu.gui", true, false, true );
-	buyMenu->SetStateString( "field_credits", "$0.00");
 	buyMenu->SetStateBool( "gameDraw", true );
 // RITUAL END
 	PACIFIER_UPDATE;
@@ -9117,15 +9116,7 @@ idMultiplayerGame::IsBuyingAllowedInTheCurrentGameMode
 ================
 */
 bool idMultiplayerGame::IsBuyingAllowedInTheCurrentGameMode( void ) {
-	if ( !gameLocal.isMultiplayer ) {
-		return false;
-	}
-
-	if ( gameLocal.gameType != GAME_TOURNEY ) {
-		return gameLocal.serverInfo.GetBool( "si_isBuyingEnabled" );
-	}
-
-	return false;
+	return true;
 }
 
 

@@ -1,6 +1,12 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Backup1",
+    "\\Backup2",
+    "\\Backup3",
+    "\\game",
+    "\\game\\weapon"
   ],
+  "SelectedNode": "\\game\\weapon",
   "PreviewInSolutionExplorer": false
 }

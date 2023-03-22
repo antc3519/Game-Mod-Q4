@@ -205,6 +205,8 @@ void idInventory::Clear( void ) {
 	powerups			= 0;
 	armor				= 0;
 	maxarmor			= 0;
+	damReduct = 1;
+	speedy = 1;
 	secretAreasDiscovered = 0;
 
 	memset( ammo, 0, sizeof( ammo ) );
@@ -3891,7 +3893,7 @@ void idPlayer::UpdateConditions( void ) {
 
 	// minus the push velocity to avoid playing the walking animation and sounds when riding a mover
 	velocity = physicsObj.GetLinearVelocity() - physicsObj.GetPushedLinearVelocity();
-	fallspeed = velocity * physicsObj.GetGravityNormal();
+	fallspeed = velocity * physicsObj.GetGravity();
 
  	if ( influenceActive ) {
  		pfl.forward		= false;
@@ -4072,6 +4074,12 @@ bool idPlayer::Give( const char *statname, const char *value, bool dropped ) {
 	if( PowerUpActive( POWERUP_GUARD ) ) {
 		boundaryHealth = inventory.maxHealth / 2;
 		boundaryArmor = inventory.maxarmor / 2;
+	}
+	if (PowerUpActive(POWERUP_JUGGERNAUT)) {
+		inventory.maxHealth = inventory.maxHealth * 2;
+	}
+	if (PowerUpActive(POWERUP_JUMPER)) {
+		pm_jumpheight.SetFloat(pm_jumpheight.GetFloat() * 2);
 	}
 	if( PowerUpActive( POWERUP_SCOUT ) ) {
 		boundaryArmor = 0;
@@ -4281,6 +4289,9 @@ idPlayer::PowerUpModifier
 float idPlayer::PowerUpModifier( int type ) {
 	float mod = 1.0f;
 
+	if (gameLocal.GetLocalPlayer()->inventory.speedy >= 2 && type == PMOD_SPEED)
+		mod *= gameLocal.GetLocalPlayer()->inventory.speedy;
+
 	if ( PowerUpActive( POWERUP_QUADDAMAGE ) ) {
 		switch( type ) {
 			case PMOD_PROJECTILE_DAMAGE: {
@@ -4307,6 +4318,18 @@ float idPlayer::PowerUpModifier( int type ) {
 			case PMOD_FIRERATE:
 				mod *= 0.7f;
 				break;
+		}
+	}
+
+	if (PowerUpActive(POWERUP_JUGGERNAUT)) {
+		switch (type) {
+		case PMOD_SPEED:
+			mod *= 1.3f;
+			break;
+
+		case PMOD_FIRERATE:
+			mod *= 0.7f;
+			break;
 		}
 	}
 
@@ -9639,10 +9662,6 @@ void idPlayer::Think( void ) {
 		common->DPrintf( "%d: enemies\n", num );
 	}
 
-	if ( !inBuyZonePrev )
-		inBuyZone = false;
-
-	inBuyZonePrev = false;
 }
 
 /*
@@ -14076,5 +14095,4 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 
 	return weaponNum;
 }
-
 // RITUAL END

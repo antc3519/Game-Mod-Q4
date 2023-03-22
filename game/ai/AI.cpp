@@ -1669,6 +1669,13 @@ void idAI::Killed( idEntity *inflictor, idEntity *attacker, int damage, const id
 		gameLocal.AlertAI( ( idActor * )attacker );
 	}
 
+	if (attacker && attacker->IsType(idPlayer::GetClassType())) {
+		idPlayer* player = static_cast<idPlayer*>(attacker);
+		player->GetHud()->SetStateInt("player_money", (player->GetHud()->GetStateInt("player_money") + 3000));
+	}
+	// give money for death
+	
+
 	// activate targets
 	ActivateTargets( this );
 

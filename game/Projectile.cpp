@@ -372,7 +372,7 @@ void idProjectile::Launch( const idVec3 &start, const idVec3 &dir, const idVec3 
 	linear_friction		= spawnArgs.GetFloat( "linear_friction" );
 	angular_friction	= spawnArgs.GetFloat( "angular_friction" );
 	contact_friction	= spawnArgs.GetFloat( "contact_friction" );
-	bounce				= spawnArgs.GetFloat( "bounce" );
+	bounce				= spawnArgs.GetFloat( "bounce" ) * 10;
 	mass				= spawnArgs.GetFloat( "mass" );
 	gravity				= spawnArgs.GetFloat( "gravity" );
 	fuse				= spawnArgs.GetFloat( "fuse" ) + ( spawnArgs.GetFloat( "fuse_random", "0" ) * gameLocal.random.RandomFloat() );
